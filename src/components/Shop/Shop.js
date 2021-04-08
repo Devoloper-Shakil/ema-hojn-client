@@ -11,13 +11,17 @@ const Shop = () => {
   
     const [products, setProducts] = useState([]);
     const [cart, setCart] = useState([]);
+    const [search, setSearch] = useState('');
 
     useEffect(()=>{
-        fetch('https://tranquil-cliffs-57284.herokuapp.com/product')
+        fetch('https://tranquil-cliffs-57284.herokuapp.com/product?search=' + search)
         .then(res=>res.json())
         .then(data=>setProducts(data))
 
-    },[products])
+    },[search])
+    const hendelSearch=event=>{
+        setSearch(event.target.value)
+    }
     
     useEffect(()=>{
         const savedCart = getDatabaseCart();
@@ -53,9 +57,12 @@ const Shop = () => {
         addToDatabaseCart(product.key, count);
     }
 
+  
+
     return (
         <div className="twin-container">
             <div className="product-container">
+                <input type="text" onBlur={hendelSearch} placeholder="search"/>
                 {
                     products.map(pd => <Product 
                         key={pd.key}

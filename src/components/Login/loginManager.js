@@ -9,6 +9,15 @@ export const initializeLoginFramework = () => {
 }
 
 export const handleGoogleSignIn = () => {
+
+  const userLoginInfo=()=>{
+    firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+      sessionStorage.setItem('token', idToken)
+    }).catch(function(error) {
+      // Handle error
+    });
+    
+  }
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     return firebase.auth().signInWithPopup(googleProvider)
     .then(res => {
@@ -20,6 +29,8 @@ export const handleGoogleSignIn = () => {
         photo: photoURL,
         success: true
       };
+      userLoginInfo();
+      
       return signedInUser;
     })
     .catch(err => {

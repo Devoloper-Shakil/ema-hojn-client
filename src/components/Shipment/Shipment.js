@@ -1,40 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import './Shipment.css';
 import { useContext } from 'react';
 import { UserContext } from '../../App';
 import { getDatabaseCart, processOrder } from '../../utilities/databaseManager';
+import ProssesPament from '../ProssesPament/ProssesPament';
 
 const Shipment = () => {
   const { register, handleSubmit, watch, errors } = useForm();
   const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+  const [shipmentData,setShipmentData]=useState(null)
   const onSubmit = data => {
-      // console.log('form submitted', data)
-      const savedCart = getDatabaseCart();
-      const orderDetails = {...loggedInUser, products: savedCart, shipment: data, orderTime: new Date()};
-
-
-      fetch('https://tranquil-cliffs-57284.herokuapp.com/addOrder', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderDetails)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if(data){
-          processOrder();
-          alert('your order placed successfully');
-        }
-      })
+    setShipmentData(data)
 
 
     };
 
+    const hendelProsses =paymentId=>{
+       // console.log('form submitted', data)
+       const savedCart = getDatabaseCart();
+       const orderDetails = {...loggedInUser, products: savedCart,paymentId, shipment: shipmentData, orderTime: new Date()};
+ 
+ 
+       fetch('https://tranquil-cliffs-57284.herokuapp.com/addOrder', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json'
+         },
+         body: JSON.stringify(orderDetails)
+       })
+       .then(res => res.json())
+       .then(data => {
+         if(data){
+           processOrder();
+           alert('your order placed successfully');
+         }
+       })
+    }
+
   console.log(watch("example")); // watch input value by passing the name of it
 
   return (
+  <div className="row">
+    <div style={{display: shipmentData? 'none':'block'}} className="col-md-6">
     <form className="ship-form" onSubmit={handleSubmit(onSubmit)}>
       <input name="name" defaultValue={loggedInUser.name} ref={register({ required: true })} placeholder="Your Name" />
       {errors.name && <span className="error">Name is required</span>}
@@ -50,6 +58,11 @@ const Shipment = () => {
       
       <input type="submit" />
     </form>
+    </div>
+    <div style={{display: shipmentData? 'block':'none'}} className="col-md-6">
+      <ProssesPament prossesSuccses={hendelProsses}></ProssesPament>
+    </div>
+  </div>
   );
 };
 
